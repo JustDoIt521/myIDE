@@ -1,28 +1,23 @@
 var dom = document.getElementById("whole");
 var num = 1;
-var m = 1; //光标所在的div记录
+var focus = 1; //光标所在的div记录
 var lineValue = [];
 var show = function(id) {
-        m = id;
+        focus = id;
         //console.log(m);
-    }
-    //将该行数值写入
-var inputIn = function() {
-        if (document.getElementById(m).value) {
-            lineValue[m] = document.getElementById(m).value;
-        } else {
-            lineValue[m] = 1;
-        }
     }
     //调整光标位置
 var focusOn = function() {
-        var point = document.getElementById(m);
+        var point = document.getElementById(focus);
+        // focus = point.id;
         point.focus();
     }
     //更新该行数据
 var refreshData = function() {
-        // console.log(document.getElementById(m).value);
-        lineValue[m] = document.getElementById(m).value;
+        var value = document.getElementById(focus).value;
+        console.log(value);
+        lineValue[focus] = value;
+        //console.log(lineValue[m]);
     }
     //更新input数据
 var refreshInput = function(i) {
@@ -33,60 +28,63 @@ var refreshInput = function(i) {
         Input = document.getElementById(i);
         Input.oninput = function() { refreshData(); }
         Input.onfocus = function() { show(this.id); }
+        Input.onclick = function() {
+            show(this.id);
+            focusOn();
+        }
     }
     //更新存储数据
 var refreshLine = function() {
-    for (var i = m; i < lineValue.length; i++) {
-        lineValue[i] = lineValue[i + 1];
+    for (var i = 1; i <= num; i++)
+        console.log(lineValue[i] + "\n");
+    for (var i = 1; i <= num; i++) {
+        if (i < focus) {
+            lineValue[i] = lineValue[i];
+        } else {
+            lineValue[i] = lineValue[i + 1];
+        }
     }
+    console.log("***" + num + "****\n");
     num--;
     dom.innerHTML = " ";
-    for (var i = 1; i <= lineValue.length; i++) {
+    for (var i = 1; i <= num; i++) {
         refreshInput(i);
         var Div = document.getElementById(i);
         Div.value = lineValue[i];
     }
-}
-var Delete = function() {
-    var value = document.getElementById(m).value;
-    if (!value) {
-        refreshLine();
-    } else {
-        lineValue[m] = value.substring(0, value.length - 1);
-        console.log(lineValue[m]);
-        //console.log(value + "    " + value.substring(0, value.length - 1));
-        // if (lineValue[m].length == 0) {
-        //     refreshLine();
-        // }
-    }
+    for (var i = 1; i <= num; i++)
+        console.log(lineValue[i] + "\n");
+    console.log("***" + num + "****\n");
 }
 var bindEvent = function() {
     document.onkeydown = function(e) {
-        //console.log(e);
-        // var value = document.getElementById(m).value;
-        // console.log(value);
         switch (e.keyCode) {
             case 8:
-                Delete();
+                var value = document.getElementById(focus).value;
+                if (!value && !lineValue[focus]) {
+                    // console.log(1);
+                    refreshLine();
+                    //focus--;
+                }
                 break;
-            case 13:
-                inputIn();
+            case 13: //回车生成新行
+                // inputIn();
                 num++;
                 refreshInput(num);
-                m++;
+                focus++;
                 focusOn();
                 break;
             case 38: //光标上移
-                inputIn();
-                if (m > 1) {
-                    m--;
+                //inputIn();
+                if (focus > 1) {
+                    focus--;
                     focusOn();
                 }
                 break;
             case 40: //光标下移
-                inputIn();
-                if (m < num) {
-                    m++;
+                //inputIn();
+                if (focus < num) {
+                    focus++;
                     focusOn();
                 }
                 break;
@@ -97,4 +95,5 @@ var bindEvent = function() {
         //console.log("m value is " + m);
     }
 }
+refreshInput(1);
 bindEvent();
